@@ -11,6 +11,9 @@ repositories {
 
 dependencies {
     implementation("ai.koog:koog-agents:0.4.1")
+    implementation("io.ktor:ktor-client-core:3.2.3")
+    implementation("io.ktor:ktor-client-cio:3.2.3")
+    implementation("it.skrape:skrapeit:1.1.5")
     testImplementation(kotlin("test"))
 }
 
