@@ -3,11 +3,13 @@ package tools
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool
 import ai.koog.agents.core.tools.reflect.ToolSet
-import it.skrape.core.htmlDocument
-import it.skrape.fetcher.BrowserFetcher
-import it.skrape.fetcher.response
-import it.skrape.fetcher.skrape
-import it.skrape.selects.html5.body
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.runBlocking
 
 @LLMDescription("A toolset for web operations")
 class WebToolset : ToolSet {
@@ -17,20 +19,15 @@ class WebToolset : ToolSet {
         @LLMDescription("The URL of the website to read")
         websiteUrl: String
     ): String {
-        return skrape(BrowserFetcher) {
-            request {
-                url = websiteUrl
-            }
-
-            response {
-                htmlDocument {
-                    body {
-                        this.findAll("").joinToString {
-                            it.text
-                        }
-                    }
-                }
-            }
+        val client = HttpClient(CIO) // TODO: centralize http client
+        return runBlocking {
+            client.get {
+                url("https://urltomarkdown.herokuapp.com")
+                parameter("url", websiteUrl)
+                parameter("title", true)
+                parameter("clean", true)
+                parameter("links", true)
+            }.bodyAsText()
         }
     }
 }
