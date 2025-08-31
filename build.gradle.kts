@@ -1,5 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.1.10"
+    kotlin("jvm") version "2.2.10"
+    kotlin("plugin.serialization") version "2.2.10"
 }
 
 group = "com.example"
@@ -23,4 +24,10 @@ tasks.test {
 
 kotlin {
     jvmToolchain(21)
+
+    sourceSets.all {
+        languageSettings {
+            optIn("kotlin.uuid.ExperimentalUuidApi")
+        }
+    }
 }
