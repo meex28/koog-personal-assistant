@@ -6,12 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RichText(
     val type: Type,
+    @SerialName("plain_text") val plainText: String,
     val text: TextContent? = null,
     val mention: MentionContent? = null,
     val equation: EquationContent? = null,
-    val annotations: Annotations,
-    @SerialName("plain_text")
-    val plainText: String,
+    val annotations: Annotations = Annotations(),
     val href: String? = null
 ) {
     @Serializable
@@ -112,11 +111,11 @@ data class RichText(
 
     @Serializable
     data class Annotations(
-        val bold: Boolean,
-        val italic: Boolean,
-        val strikethrough: Boolean,
-        val underline: Boolean,
-        val code: Boolean,
-        val color: String
+        val bold: Boolean = false,
+        val italic: Boolean = false,
+        val strikethrough: Boolean = false,
+        val underline: Boolean = false,
+        val code: Boolean = false,
+        val color: String = "default"
     )
 }

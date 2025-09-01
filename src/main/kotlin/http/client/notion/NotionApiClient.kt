@@ -1,7 +1,9 @@
 package com.example.http.client.notion
 
+import CreatePageRequest
 import com.example.http.client.buildHttpClient
 import com.example.http.client.notion.responses.Database
+import com.example.http.client.notion.responses.Page
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.DefaultRequest
@@ -9,6 +11,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -35,6 +38,7 @@ class NotionClient(token: String) {
     }
 
     val database = NotionDatabaseClient(httpClient)
+    val page = NotionPageClient(httpClient)
 }
 
 class NotionDatabaseClient(private val httpClient: HttpClient) {
@@ -50,5 +54,10 @@ class NotionDatabaseClient(private val httpClient: HttpClient) {
 }
 
 class NotionPageClient(private val httpClient: HttpClient) {
-
+    suspend fun create(request: CreatePageRequest): Page {
+        return httpClient.post("https://api.notion.com/v1/pages") {
+            setBody(request)
+            contentType(ContentType.Application.Json)
+        }.body()
+    }
 }
