@@ -10,7 +10,7 @@ interface ChatHistoryProps {
 
 export default function ChatHistory({ messages }: ChatHistoryProps) {
     return (
-        <Conversation>
+        <Conversation className="flex-1 overflow-y-auto">
             <ConversationContent>
                 {messages.map((message, index) => (
                     <Message from={message.from} key={index}>

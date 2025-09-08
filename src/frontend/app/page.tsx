@@ -23,7 +23,7 @@ export default function Home() {
     };
 
     return (
-        <div className="max-w-4/5 m-auto">
+        <div className="max-w-4/5 h-full mx-auto flex flex-col justify-end py-10">
             <ChatHistory messages={messages}/>
             <MessageInput onSubmit={submitUserMessage} isLoading={loading}/>
             {error && <div className="text-red-500 mt-2">Error: {error.message}</div>}
