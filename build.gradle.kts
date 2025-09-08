@@ -20,6 +20,7 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:3.2.3")
     implementation("io.ktor:ktor-server-content-negotiation:3.2.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.2.3")
+    implementation("io.ktor:ktor-server-cors:3.2.3")
 
     implementation(libs.bundles.logback)
 

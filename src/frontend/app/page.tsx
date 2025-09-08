@@ -1,62 +1,32 @@
 'use client'
 
-import {Conversation, ConversationContent, ConversationScrollButton} from "@/components/ai-elements/conversation";
-import {Message, MessageContent} from "@/components/ai-elements/message";
-import type {UIMessage} from "ai";
-import {
-    PromptInput,
-    PromptInputSubmit,
-    PromptInputTextarea,
-    PromptInputToolbar
-} from "@/components/ai-elements/prompt-input";
-import React, {FormEvent, useState} from "react";
+import React from "react";
+import ChatHistory from "@/components/ChatHistory";
+import MessageInput from "@/components/MessageInput";
+import usePostChatMessage from "@/hooks/useApi";
+import useChatHistory from "@/hooks/useChatHistory";
 
 export default function Home() {
-    const [messages, setMessages] = useState<{ from: UIMessage['role'], content: string }[]>([
-        {from: "user", content: "Hi there!"},
+    const {messages, addUserMessage, addAssistantMessage} = useChatHistory([
         {from: "assistant", content: "Hello! How can I help you today?"}
     ]);
-    const [prompt, setPrompt] = useState("")
-    const sendMessage = (e: FormEvent) => {
-        e.preventDefault();
+    const {execute: sendMessage, loading, error} = usePostChatMessage();
 
-        // Don't send empty messages
-        if (!prompt.trim()) return;
-
-        setMessages(prevMessages => [
-            ...prevMessages,
-            {from: "user", content: prompt}
-        ]);
-        setPrompt("");
+    const submitUserMessage = async (message: string) => {
+        addUserMessage(message);
+        const response = await sendMessage({message});
+        if (response) {
+            addAssistantMessage(response.message)
+        } else {
+            console.error(`Failed to get response from the server. Response: ${response}`);
+        }
     };
 
-    return (<div className="max-w-4/5 m-auto">
-            <Conversation>
-                <ConversationContent>
-                    {messages.map((message) => (
-                        <Message from={message.from} key={message.content}>
-                            <MessageContent>{message.content}</MessageContent>
-                        </Message>
-                    ))}
-                </ConversationContent>
-                <ConversationScrollButton/>
-            </Conversation>
-
-            <PromptInput onSubmit={sendMessage} className="max-w-4/5 m-auto mt-4 relative">
-                <PromptInputTextarea
-                    value={prompt}
-                    onChange={(e) => {
-                        setPrompt(e.target.value)
-                    }}
-                />
-                <PromptInputToolbar>
-                    <PromptInputSubmit
-                        className="absolute right-1 bottom-1"
-                        disabled={false}
-                        status={'ready'}
-                    />
-                </PromptInputToolbar>
-            </PromptInput>
+    return (
+        <div className="max-w-4/5 m-auto">
+            <ChatHistory messages={messages}/>
+            <MessageInput onSubmit={submitUserMessage} isLoading={loading}/>
+            {error && <div className="text-red-500 mt-2">Error: {error.message}</div>}
         </div>
-    )
-};
+    );
+}
