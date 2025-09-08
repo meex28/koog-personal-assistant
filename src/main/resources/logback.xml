@@ -1,0 +1,26 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} %-5level [%thread/%logger{36}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <variable name="LOG_LEVEL" value="${LOG_LEVEL:-debug}"/>
+
+    <if condition='"${APP_ENV}".equals("prod")'>
+        <then>
+            <root level="info">
+                <appender-ref ref="JSON"/>
+            </root>
+        </then>
+        <else>
+            <root level="${LOG_LEVEL}">
+                <appender-ref ref="STDOUT"/>
+            </root>
+        </else>
+    </if>
+</configuration>
