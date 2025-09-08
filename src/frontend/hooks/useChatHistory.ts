@@ -1,27 +1,36 @@
-import {useState} from "react";
-import type {UIMessage} from "ai";
-
-type ChatMessage = { from: UIMessage['role'], content: string };
+import {useState, useCallback} from "react";
+import {ChatMessage} from "@/hooks/useApi";
 
 export default function useChatHistory(initialMessages: ChatMessage[] = []) {
     const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
 
-    const addMessage = (message: ChatMessage) => {
-        setMessages(prev => [...prev, message]);
-    };
+    const addMessage = useCallback((message: ChatMessage): Promise<ChatMessage[]> => {
+        return new Promise((resolve) => {
+            setMessages(prev => {
+                const updatedMessages = [...prev, message];
+                resolve(updatedMessages);
+                return updatedMessages;
+            });
+        });
+    }, []);
 
-    const addUserMessage = (content: string) => {
-        addMessage({ from: "user", content });
-    };
+    const addUserMessage = useCallback((content: string): Promise<ChatMessage[]> => {
+        return addMessage({ from: "user", content });
+    }, [addMessage]);
 
-    const addAssistantMessage = (content: string) => {
-        addMessage({ from: "assistant", content });
-    };
+    const addAssistantMessage = useCallback((content: string): Promise<ChatMessage[]> => {
+        return addMessage({ from: "assistant", content });
+    }, [addMessage]);
+
+    const replaceChatHistory = useCallback((newMessages: ChatMessage[]) => {
+        setMessages(newMessages);
+    }, []);
 
     return {
         messages,
         addMessage,
         addUserMessage,
-        addAssistantMessage
+        addAssistantMessage,
+        replaceChatHistory
     };
 }

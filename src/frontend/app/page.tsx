@@ -7,16 +7,16 @@ import usePostChatMessage from "@/hooks/useApi";
 import useChatHistory from "@/hooks/useChatHistory";
 
 export default function Home() {
-    const {messages, addUserMessage, addAssistantMessage} = useChatHistory([
+    const {messages, addUserMessage, addAssistantMessage, replaceChatHistory} = useChatHistory([
         {from: "assistant", content: "Hello! How can I help you today?"}
     ]);
     const {execute: sendMessage, loading, error} = usePostChatMessage();
 
     const submitUserMessage = async (message: string) => {
-        addUserMessage(message);
-        const response = await sendMessage({message});
+        const updatedMessages = await addUserMessage(message);
+        const response = await sendMessage({messages: updatedMessages});
         if (response) {
-            addAssistantMessage(response.message)
+            replaceChatHistory(response.messages)
         } else {
             console.error(`Failed to get response from the server. Response: ${response}`);
         }

@@ -1,15 +1,16 @@
 import useFetch from "@/hooks/useFetch";
 
-interface ChatRequest {
-    message: string;
+export interface ChatHistory {
+    messages: ChatMessage[];
 }
 
-interface ChatResponse {
-    message: string;
+export interface ChatMessage {
+    from: "user" | "assistant" | "system";
+    content: string;
 }
 
 export default function usePostChatMessage() {
-    return useFetch<ChatResponse, ChatRequest>(
+    return useFetch<ChatHistory, ChatHistory>(
         "http://localhost:8080/ai/chat",
         'POST'
     );

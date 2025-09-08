@@ -4,8 +4,9 @@ import ai.koog.ktor.Koog
 import ai.koog.ktor.llm
 import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.clients.openrouter.OpenRouterModels
-import com.example.http.server.requests.ChatRequest
-import com.example.http.server.requests.ChatResponse
+import ai.koog.prompt.message.Message
+import com.example.http.server.requests.ChatHistory
+import com.example.http.server.requests.ChatMessage
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
@@ -48,12 +49,18 @@ fun Application.module() {
     routing {
         route("/ai") {
             post("/chat") {
-                val request = call.receive<ChatRequest>()
+                val chatHistory = call.receive<ChatHistory>()
                 val apiKey = System.getenv("OPEN_ROUTER_API_KEY")
 
                 val output = llm().execute(
                     prompt = prompt("chat") {
-                        user(request.message)
+                        chatHistory.messages.forEach {
+                            when (it) {
+                                is ChatMessage.UserChatMessage -> user(it.content)
+                                is ChatMessage.AssistantChatMessage -> assistant(it.content)
+                                is ChatMessage.SystemChatMessage -> system(it.content)
+                            }
+                        }
                     },
                     model = OpenRouterModels.GPT5Mini
                 )
@@ -64,7 +71,15 @@ fun Application.module() {
 //
 //                val output = agent.run(request.message)
 
-                call.respond(ChatResponse(message = output.last().content))
+                val response = chatHistory.addMessages(output.mapNotNull {
+                    when (it.role) {
+                        Message.Role.System -> ChatMessage.SystemChatMessage(content = it.content)
+                        Message.Role.User -> ChatMessage.UserChatMessage(content = it.content)
+                        Message.Role.Assistant -> ChatMessage.AssistantChatMessage(content = it.content)
+                        Message.Role.Tool -> null
+                    }
+                })
+                call.respond(response)
             }
         }
     }
