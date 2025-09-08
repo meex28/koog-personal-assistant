@@ -5,6 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
+// TODO: split to be history and input
 @Serializable
 data class ChatHistory(
     val messages: List<ChatMessage>,
@@ -12,6 +13,8 @@ data class ChatHistory(
     fun addMessages(messages: List<ChatMessage>) = this.copy(
         messages = this.messages + messages
     )
+
+    fun addMessage(message: ChatMessage) = addMessages(listOf(message))
 }
 
 @OptIn(ExperimentalSerializationApi::class)

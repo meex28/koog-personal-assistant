@@ -1,3 +1,4 @@
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import com.example.http.client.notion.responses.RichText as NotionRichText
@@ -41,4 +42,15 @@ sealed interface PageProperty {
     @Serializable
     @SerialName("url")
     data class Url(val url: String) : PageProperty
+
+    @Serializable
+    @SerialName("date")
+    data class Date(val date: InnerDate) : PageProperty {
+        @Serializable
+        data class InnerDate(val start: LocalDate, val end: LocalDate?)
+    }
+
+    @Serializable
+    @SerialName("checkbox")
+    data class Checkbox(val checkbox: Boolean) : PageProperty
 }

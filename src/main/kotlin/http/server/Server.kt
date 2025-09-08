@@ -1,10 +1,9 @@
 package http.server
 
 import ai.koog.ktor.Koog
-import ai.koog.ktor.llm
-import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.clients.openrouter.OpenRouterModels
-import ai.koog.prompt.message.Message
+import ai.koog.prompt.executor.llms.all.simpleOpenRouterExecutor
+import com.example.ai.tasksManagementAiAgent
 import com.example.http.server.requests.ChatHistory
 import com.example.http.server.requests.ChatMessage
 import io.ktor.http.HttpHeaders
@@ -49,36 +48,31 @@ fun Application.module() {
     routing {
         route("/ai") {
             post("/chat") {
-                val chatHistory = call.receive<ChatHistory>()
                 val apiKey = System.getenv("OPEN_ROUTER_API_KEY")
 
-                val output = llm().execute(
-                    prompt = prompt("chat") {
-                        chatHistory.messages.forEach {
-                            when (it) {
-                                is ChatMessage.UserChatMessage -> user(it.content)
-                                is ChatMessage.AssistantChatMessage -> assistant(it.content)
-                                is ChatMessage.SystemChatMessage -> system(it.content)
-                            }
-                        }
-                    },
-                    model = OpenRouterModels.GPT5Mini
-                )
-//                val agent = articlesAiAgent(
-//                    executor = simpleOpenRouterExecutor(apiKey),
-//                    llmModel = OpenRouterModels.GPT5Mini,
-//                )
-//
-//                val output = agent.run(request.message)
+                val chatHistory = call.receive<ChatHistory>()
+                val chatPreviousMessages = chatHistory.messages.subList(0, chatHistory.messages.size - 1)
+                val userInput = chatHistory.messages.last()
+                require(userInput is ChatMessage.UserChatMessage) {
+                    "Last message must be from user!"
+                }
 
-                val response = chatHistory.addMessages(output.mapNotNull {
-                    when (it.role) {
-                        Message.Role.System -> ChatMessage.SystemChatMessage(content = it.content)
-                        Message.Role.User -> ChatMessage.UserChatMessage(content = it.content)
-                        Message.Role.Assistant -> ChatMessage.AssistantChatMessage(content = it.content)
-                        Message.Role.Tool -> null
+                val agent = tasksManagementAiAgent(
+                    executor = simpleOpenRouterExecutor(apiKey),
+                    llmModel = OpenRouterModels.GPT5Mini,
+                ) {
+                    chatPreviousMessages.forEach {
+                        when (it) {
+                            is ChatMessage.UserChatMessage -> user(it.content)
+                            is ChatMessage.AssistantChatMessage -> assistant(it.content)
+                            is ChatMessage.SystemChatMessage -> system(it.content)
+                        }
                     }
-                })
+                }
+
+                val output = agent.run(userInput.content)
+
+                val response = chatHistory.addMessage(ChatMessage.AssistantChatMessage(output))
                 call.respond(response)
             }
         }

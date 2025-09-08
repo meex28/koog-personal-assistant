@@ -2,6 +2,7 @@ package com.example.http.client.notion
 
 import CreatePageRequest
 import com.example.http.client.buildHttpClient
+import com.example.http.client.notion.responses.DataSourceQueryResponse
 import com.example.http.client.notion.responses.Database
 import com.example.http.client.notion.responses.Page
 import io.ktor.client.HttpClient
@@ -13,7 +14,6 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
@@ -31,7 +31,7 @@ class NotionClient(token: String) {
         }
 
         install(DefaultRequest) {
-            headers.append("Notion-Version", "2022-06-28")
+            headers.append("Notion-Version", "2025-09-03")
             bearerAuth(token)
             contentType(ContentType.Application.Json)
         }
@@ -39,17 +39,20 @@ class NotionClient(token: String) {
 
     val database = NotionDatabaseClient(httpClient)
     val page = NotionPageClient(httpClient)
+    val dataSource = NotionDataSourceClient(httpClient)
 }
 
 class NotionDatabaseClient(private val httpClient: HttpClient) {
-    suspend fun query(databaseId: String): String {
-        val response: HttpResponse = httpClient.post("https://api.notion.com/v1/databases/$databaseId/query")
-        return response.bodyAsText()
-    }
-
     suspend fun get(databaseId: String): Database {
         val response: HttpResponse = httpClient.get("https://api.notion.com/v1/databases/$databaseId")
         return response.body<Database>()
+    }
+}
+
+class NotionDataSourceClient(private val httpClient: HttpClient) {
+    suspend fun query(dataSourceId: String): DataSourceQueryResponse {
+        val response: HttpResponse = httpClient.post("https://api.notion.com/v1/data_sources/$dataSourceId/query")
+        return response.body<DataSourceQueryResponse>()
     }
 }
 
