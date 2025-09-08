@@ -11,8 +11,13 @@ fun main() {
         llmModel = OpenRouterModels.GPT5Mini,
     )
 
+    val input = """
+        I read recently this article: https://event-driven.io/en/idempotent_command_handling/
+        Add this article to my Notion read list and write for a short summary (few keypoints).
+    """.trimIndent()
+
     val result = runBlocking {
-        agent.run("Add this article to my read list in Notion: https://maikotrindade.com/ai/kotlin/android/development/agents/2025/08/19/building-agentic-ai-mobile-tester-koog-kotlin. Do not write summary but just save it to the database.")
+        agent.run(input)
     }
 
     println("RESULT:")
