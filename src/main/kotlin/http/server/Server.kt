@@ -3,7 +3,7 @@ package http.server
 import ai.koog.ktor.Koog
 import ai.koog.prompt.executor.clients.openrouter.OpenRouterModels
 import ai.koog.prompt.executor.llms.all.simpleOpenRouterExecutor
-import com.example.articlesAiAgent
+import com.example.ai.articlesAiAgent
 import com.example.http.server.requests.ChatRequest
 import com.example.http.server.requests.ChatResponse
 import io.ktor.serialization.kotlinx.json.json

@@ -1,4 +1,4 @@
-package com.example.tools
+package com.example.ai.tools
 
 import CreatePageRequest
 import PageParent

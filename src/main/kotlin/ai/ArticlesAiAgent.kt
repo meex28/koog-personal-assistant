@@ -1,4 +1,4 @@
-package com.example
+package com.example.ai
 
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.agents.core.tools.ToolRegistry
@@ -8,8 +8,8 @@ import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
 import ai.koog.prompt.markdown.markdown
 import ai.koog.prompt.text.text
+import com.example.ai.tools.NotionToolset
 import com.example.http.client.notion.NotionClient
-import com.example.tools.NotionToolset
 import tools.WebToolset
 
 fun articlesAiAgent(executor: PromptExecutor, llmModel: LLModel): AIAgent<String, String> {
