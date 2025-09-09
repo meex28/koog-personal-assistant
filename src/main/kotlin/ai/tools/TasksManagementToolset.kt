@@ -11,6 +11,7 @@ import com.example.http.client.notion.NotionClient
 import com.example.http.client.notion.responses.RichText
 import kotlinx.datetime.LocalDate
 
+// TODO: create domain data class for Task and extension function toNotionProperties
 @LLMDescription("A toolset to manage tasks of the user")
 class TasksManagementToolset(
     private val notionClient: NotionClient,
