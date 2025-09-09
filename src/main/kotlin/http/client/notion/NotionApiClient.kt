@@ -58,9 +58,10 @@ class NotionDataSourceClient(private val httpClient: HttpClient) {
 
 class NotionPageClient(private val httpClient: HttpClient) {
     suspend fun create(request: CreatePageRequest): Page {
-        return httpClient.post("https://api.notion.com/v1/pages") {
+        val response = httpClient.post("https://api.notion.com/v1/pages") {
             setBody(request)
             contentType(ContentType.Application.Json)
-        }.body()
+        }
+        return response.body()
     }
 }

@@ -1,21 +1,27 @@
 package com.example.ai.tools
 
+import CreatePageRequest
+import PageParent
 import PageProperty
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool
 import ai.koog.agents.core.tools.reflect.ToolSet
 import ai.koog.prompt.markdown.markdown
 import com.example.http.client.notion.NotionClient
+import com.example.http.client.notion.responses.RichText
+import kotlinx.datetime.LocalDate
 
 @LLMDescription("A toolset to manage tasks of the user")
 class TasksManagementToolset(
     private val notionClient: NotionClient,
-    private val tasksDatabaseId: String
+    private val tasksDataSourceId: String,
+    private val tasksDatabaseId: String,
 ) : ToolSet {
     @Tool
     @LLMDescription("Get all tasks of the user")
+    // TODO: get tasks with filters applied (?)
     suspend fun fetchTasks(): String {
-        val response = notionClient.dataSource.query(dataSourceId = tasksDatabaseId)
+        val response = notionClient.dataSource.query(dataSourceId = tasksDataSourceId)
         return markdown {
             bulleted {
                 response.results.forEach {
@@ -28,8 +34,41 @@ class TasksManagementToolset(
             }
         }
     }
-    // TODO: get tasks with filters applied (?)
-    // TODO: add task
+
+    @Tool
+    @LLMDescription("Create a new task for the user")
+    suspend fun createTask(
+        @LLMDescription("Task - what needs to be done (example: Create a Jira ticket to fix the pagination bug)")
+        task: String,
+        @LLMDescription("Due date of the task in ISO format (example: 2024-09-20)")
+        dueDate: String,
+    ) {
+        val request = CreatePageRequest(
+            parent = PageParent.Database(databaseId = tasksDatabaseId),
+            properties = mapOf(
+                "Done" to PageProperty.Checkbox(checkbox = false),
+                "Task" to PageProperty.Title(
+                    title = listOf(
+                        RichText(
+                            type = RichText.Type.TEXT,
+                            text = RichText.TextContent(
+                                content = task,
+                            ),
+                            plainText = task
+                        )
+                    )
+                ),
+                "Due Date" to PageProperty.Date(
+                    date = PageProperty.Date.InnerDate(
+                        start = LocalDate.parse(dueDate),
+                        end = null
+                    )
+                )
+            ),
+        )
+        notionClient.page.create(request)
+    }
+
     // TODO: set task as done
 }
 

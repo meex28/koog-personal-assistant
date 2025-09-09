@@ -21,7 +21,8 @@ fun tasksManagementAiAgent(
 ): AIAgent<String, String> {
     val tasksManagementTools = TasksManagementToolset(
         notionClient = NotionClient(token = System.getenv("NOTION_API_KEY")),
-        tasksDatabaseId = "26821a96-5632-80d7-be87-000bdd1ac7c0"
+        tasksDataSourceId = "26821a96-5632-80d7-be87-000bdd1ac7c0",
+        tasksDatabaseId = "26821a96563280bab09ee124d6b8d4f4"
     )
 
     val systemPropt = markdown {
