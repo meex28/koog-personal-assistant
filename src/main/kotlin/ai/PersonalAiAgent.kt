@@ -18,6 +18,7 @@ fun personalAiAgent(
     notionClient: NotionClient,
     executor: PromptExecutor,
     llmModel: LLModel,
+    additionalTools: ToolRegistry.Builder.() -> Unit,
     buildPrompt: PromptBuilder.() -> Unit
 ): AIAgent<String, String> {
     val tasksManagementTools = TasksManagementToolset(
@@ -47,6 +48,7 @@ fun personalAiAgent(
         ),
         toolRegistry = ToolRegistry {
             tools(tasksManagementTools)
+            additionalTools()
         },
     )
 

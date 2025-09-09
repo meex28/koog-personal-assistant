@@ -1,6 +1,11 @@
 package com.example.http.server
 
 import ai.koog.agents.core.agent.AIAgent
+import ai.koog.agents.core.agent.AIAgentTool
+import ai.koog.agents.core.agent.asTool
+import ai.koog.agents.core.tools.Tool
+import ai.koog.agents.core.tools.ToolParameterDescriptor
+import ai.koog.agents.core.tools.ToolParameterType
 import ai.koog.prompt.dsl.PromptBuilder
 import ai.koog.prompt.executor.clients.openrouter.OpenRouterModels
 import ai.koog.prompt.executor.llms.all.simpleOpenRouterExecutor
@@ -42,11 +47,26 @@ val aiAgentsModule = module {
         )
     }
 
-    factory<AIAgent<*, *>>(named("personalAiAgent")) { (buildPrompt: PromptBuilder.() -> Unit) ->
+    single<Tool<AIAgentTool.AgentToolArgs, AIAgentTool.AgentToolResult>>(named("articlesAiAgentTool")) {
+        get<AIAgent<String, String>>(named("articlesAiAgent")).asTool(
+            agentName = "articlesExpert",
+            agentDescription = "An expert in articles. Capabilities: retrieve article content by URL, summarizing and managing articles in user database.",
+            inputDescriptor = ToolParameterDescriptor(
+                name = "request",
+                description = "Articles expert request",
+                type = ToolParameterType.String
+            ),
+        )
+    }
+
+    factory<AIAgent<String, String>>(named("personalAiAgent")) { (buildPrompt: PromptBuilder.() -> Unit) ->
         personalAiAgent(
             notionClient = get(),
             executor = get(),
             llmModel = OpenRouterModels.GPT5,
+            additionalTools = {
+                tool(get<Tool<*, *>>(named("articlesAiAgentTool")))
+            },
             buildPrompt = buildPrompt
         )
     }
