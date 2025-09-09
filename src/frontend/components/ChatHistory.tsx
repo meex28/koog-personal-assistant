@@ -1,6 +1,7 @@
 import {Conversation, ConversationContent, ConversationScrollButton} from "@/components/ai-elements/conversation";
 import {Message, MessageContent} from "@/components/ai-elements/message";
 import type {UIMessage} from "ai";
+import {Response} from "@/components/ai-elements/response";
 
 type MessageType = { from: UIMessage['role'], content: string };
 
@@ -14,7 +15,11 @@ export default function ChatHistory({ messages }: ChatHistoryProps) {
             <ConversationContent>
                 {messages.map((message, index) => (
                     <Message from={message.from} key={index}>
-                        <MessageContent>{message.content}</MessageContent>
+                        <MessageContent>
+                            <Response>
+                                {message.content}
+                            </Response>
+                        </MessageContent>
                     </Message>
                 ))}
             </ConversationContent>

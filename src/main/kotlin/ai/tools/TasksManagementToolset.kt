@@ -4,6 +4,7 @@ import PageProperty
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool
 import ai.koog.agents.core.tools.reflect.ToolSet
+import ai.koog.prompt.markdown.markdown
 import com.example.http.client.notion.NotionClient
 
 @LLMDescription("A toolset to manage tasks of the user")
@@ -15,15 +16,18 @@ class TasksManagementToolset(
     @LLMDescription("Get all tasks of the user")
     suspend fun fetchTasks(): String {
         val response = notionClient.dataSource.query(dataSourceId = tasksDatabaseId)
-        return response.results.joinToString(separator = "\n") {
-            val done = it.properties["Done"]!!.toLlmString()
-            val task = it.properties["Task"]!!.toLlmString()
-            val dueDate = it.properties["Due Date"]!!.toLlmString()
-            "- Task: $task (done: $done, due date: $dueDate)"
+        return markdown {
+            bulleted {
+                response.results.forEach {
+                    val done = it.properties["Done"]!!.toLlmString()
+                    val task = it.properties["Task"]!!.toLlmString()
+                    val dueDate = it.properties["Due Date"]!!.toLlmString()
+
+                    item("Task: $task (done: $done, due date: $dueDate)")
+                }
+            }
         }
     }
-
-    // TODO: get all tasks
     // TODO: get tasks with filters applied (?)
     // TODO: add task
     // TODO: set task as done
