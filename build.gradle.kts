@@ -11,20 +11,11 @@ repositories {
 }
 
 dependencies {
-    implementation("ai.koog:koog-agents:0.4.1")
-    implementation("ai.koog:koog-ktor:0.4.1")
-    implementation("io.ktor:ktor-client-core:3.2.3")
-    implementation("io.ktor:ktor-client-cio:3.2.3")
-    implementation("io.ktor:ktor-server-core:3.2.3")
-    implementation("io.ktor:ktor-server-call-logging:3.2.3")
-    implementation("io.ktor:ktor-server-netty:3.2.3")
-    implementation("io.ktor:ktor-server-content-negotiation:3.2.3")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:3.2.3")
-    implementation("io.ktor:ktor-server-cors:3.2.3")
-
+    implementation(libs.bundles.koog)
+    implementation(libs.bundles.ktorClient)
+    implementation(libs.bundles.ktorServer)
+    implementation(libs.bundles.koin)
     implementation(libs.bundles.logback)
-    implementation("io.insert-koin:koin-ktor:4.1.1")
-    implementation("io.insert-koin:koin-logger-slf4j:4.1.1")
 
     testImplementation(kotlin("test"))
 }

@@ -1,11 +1,56 @@
+[versions]
+koog = "0.4.1"
+ktor = "3.2.3"
+koin = "4.1.1"
+
 [libraries]
 logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.3" }
 logback-logstash-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version = "7.3" }
 janino = { module = "org.codehaus.janino:janino", version = "3.0.7" }
+
+koog-agents = { module = "ai.koog:koog-agents", version.ref = "koog" }
+koog-ktor = { module = "ai.koog:koog-ktor", version.ref = "koog" }
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
+
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
 
 [bundles]
 logback = [
     "logback-classic",
     "logback-logstash-encoder",
     "janino"
+]
+
+koog = [
+    "koog-agents",
+    "koog-ktor"
+]
+
+ktorClient = [
+    "ktor-client-core",
+    "ktor-client-cio"
+]
+
+ktorServer = [
+    "ktor-server-core",
+    "ktor-server-call-logging",
+    "ktor-server-netty",
+    "ktor-server-content-negotiation",
+    "ktor-serialization-kotlinx-json",
+    "ktor-server-cors"
+]
+
+koin = [
+    "koin-ktor",
+    "koin-logger-slf4j"
 ]
