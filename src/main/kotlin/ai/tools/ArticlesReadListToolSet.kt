@@ -9,27 +9,24 @@ import ai.koog.agents.core.tools.reflect.ToolSet
 import com.example.http.client.notion.NotionClient
 import com.example.http.client.notion.responses.RichText
 
-@LLMDescription("A toolset for Notion operations")
-class NotionToolset(
+@LLMDescription("A toolset for operations in a user read list.")
+class ArticlesReadListToolSet(
     private val notionClient: NotionClient,
     private val databaseId: String
 ) : ToolSet {
     @Tool
-    @LLMDescription("Save an article in the Notion database")
-    suspend fun saveArticleInNotionDatabase(
+    @LLMDescription("Save an article in the read list.")
+    suspend fun saveArticle(
         @LLMDescription("The title of the article")
         title: String,
         @LLMDescription("The URL of the article")
         url: String,
-        @LLMDescription("The author of the article")
-        author: String
     ): String {
         val response = notionClient.page.create(
             request = buildCreateArticlePageRequest(
                 databaseId = databaseId,
                 title = title,
                 url = url,
-                author = author
             )
         )
 
@@ -41,7 +38,6 @@ private fun buildCreateArticlePageRequest(
     databaseId: String,
     title: String,
     url: String,
-    author: String
 ): CreatePageRequest {
     return CreatePageRequest(
         parent = PageParent.Database(databaseId = databaseId),
@@ -54,17 +50,6 @@ private fun buildCreateArticlePageRequest(
                             content = title,
                         ),
                         plainText = title
-                    )
-                )
-            ),
-            "Author" to PageProperty.RichText(
-                listOf(
-                    RichText(
-                        type = RichText.Type.TEXT,
-                        text = RichText.TextContent(
-                            content = author,
-                        ),
-                        plainText = author
                     )
                 )
             ),

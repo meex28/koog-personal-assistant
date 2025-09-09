@@ -3,8 +3,8 @@ package http.server
 import ai.koog.agents.core.agent.AIAgent
 import ai.koog.ktor.Koog
 import ai.koog.prompt.dsl.PromptBuilder
-import com.example.http.server.aiAgentsModule
-import com.example.http.server.aiConfigurationModule
+import com.example.ai.aiAgentsModule
+import com.example.ai.aiConfigurationModule
 import com.example.http.server.notionModule
 import com.example.http.server.requests.ChatHistory
 import com.example.http.server.requests.ChatMessage
@@ -78,7 +78,7 @@ fun Application.module() {
                         }
                     }
                 }
-                val agent = get<AIAgent<String, String>>(named("personalAiAgent")) {
+                val agent = get<AIAgent<String, String>>(named("PersonalAiAgent")) {
                     parametersOf(promptBuilder)
                 }
 
