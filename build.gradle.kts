@@ -23,6 +23,8 @@ dependencies {
     implementation("io.ktor:ktor-server-cors:3.2.3")
 
     implementation(libs.bundles.logback)
+    implementation("io.insert-koin:koin-ktor:4.1.1")
+    implementation("io.insert-koin:koin-logger-slf4j:4.1.1")
 
     testImplementation(kotlin("test"))
 }

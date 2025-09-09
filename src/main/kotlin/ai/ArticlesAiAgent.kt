@@ -12,10 +12,16 @@ import com.example.ai.tools.NotionToolset
 import com.example.http.client.notion.NotionClient
 import tools.WebToolset
 
-fun articlesAiAgent(executor: PromptExecutor, llmModel: LLModel): AIAgent<String, String> {
+fun articlesAiAgent(
+    notionClient: NotionClient,
+    executor: PromptExecutor,
+    llmModel: LLModel
+): AIAgent<String, String> {
     val notionDatabaseId = "26021a96563280b093eeda80fee9fb00"
-    val notionClient = NotionClient(token = System.getenv("NOTION_API_KEY"))
-    val notionTools = NotionToolset(notionClient, notionDatabaseId)
+    val notionTools = NotionToolset(
+        notionClient = notionClient,
+        databaseId = notionDatabaseId
+    )
     val webTools = WebToolset()
 
     val systemPropt = markdown {

@@ -14,13 +14,14 @@ import ai.koog.prompt.text.text
 import com.example.ai.tools.TasksManagementToolset
 import com.example.http.client.notion.NotionClient
 
-fun tasksManagementAiAgent(
+fun personalAiAgent(
+    notionClient: NotionClient,
     executor: PromptExecutor,
     llmModel: LLModel,
     buildPrompt: PromptBuilder.() -> Unit
 ): AIAgent<String, String> {
     val tasksManagementTools = TasksManagementToolset(
-        notionClient = NotionClient(token = System.getenv("NOTION_API_KEY")),
+        notionClient = notionClient,
         tasksDataSourceId = "26821a96-5632-80d7-be87-000bdd1ac7c0",
         tasksDatabaseId = "26821a96563280bab09ee124d6b8d4f4"
     )

@@ -1,0 +1,53 @@
+package com.example.http.server
+
+import ai.koog.agents.core.agent.AIAgent
+import ai.koog.prompt.dsl.PromptBuilder
+import ai.koog.prompt.executor.clients.openrouter.OpenRouterModels
+import ai.koog.prompt.executor.llms.all.simpleOpenRouterExecutor
+import ai.koog.prompt.executor.model.PromptExecutor
+import com.example.ai.articlesAiAgent
+import com.example.ai.personalAiAgent
+import com.example.http.client.notion.NotionClient
+import com.example.http.client.notion.NotionClientConfig
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
+
+val notionModule = module {
+    single<NotionClientConfig> {
+        NotionClientConfig(
+            token = System.getenv("NOTION_API_KEY") ?: error("Missing NOTION_API_KEY environment variable")
+        )
+    }
+
+    single<NotionClient> {
+        NotionClient(
+            config = get()
+        )
+    }
+}
+
+val aiConfigurationModule = module {
+    single<PromptExecutor> {
+        val apiKey = System.getenv("OPEN_ROUTER_API_KEY")
+        simpleOpenRouterExecutor(apiKey)
+    }
+}
+
+val aiAgentsModule = module {
+    single<AIAgent<*, *>>(named("articlesAiAgent")) {
+        articlesAiAgent(
+            notionClient = get(),
+            executor = get(),
+            llmModel = OpenRouterModels.GPT5
+        )
+    }
+
+    factory<AIAgent<*, *>>(named("personalAiAgent")) { (buildPrompt: PromptBuilder.() -> Unit) ->
+        personalAiAgent(
+            notionClient = get(),
+            executor = get(),
+            llmModel = OpenRouterModels.GPT5,
+            buildPrompt = buildPrompt
+        )
+    }
+}

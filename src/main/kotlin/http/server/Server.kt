@@ -1,9 +1,11 @@
 package http.server
 
+import ai.koog.agents.core.agent.AIAgent
 import ai.koog.ktor.Koog
-import ai.koog.prompt.executor.clients.openrouter.OpenRouterModels
-import ai.koog.prompt.executor.llms.all.simpleOpenRouterExecutor
-import com.example.ai.tasksManagementAiAgent
+import ai.koog.prompt.dsl.PromptBuilder
+import com.example.http.server.aiAgentsModule
+import com.example.http.server.aiConfigurationModule
+import com.example.http.server.notionModule
 import com.example.http.server.requests.ChatHistory
 import com.example.http.server.requests.ChatMessage
 import io.ktor.http.HttpHeaders
@@ -21,6 +23,11 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
+import org.koin.ktor.ext.get
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
 
 fun Application.module() {
     install(ContentNegotiation) {
@@ -32,7 +39,14 @@ fun Application.module() {
             openRouter(apiKey = System.getenv("OPEN_ROUTER_API_KEY"))
         }
     }
-
+    install(Koin) {
+        slf4jLogger()
+        modules(
+            notionModule,
+            aiConfigurationModule,
+            aiAgentsModule
+        )
+    }
     install(CORS) {
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Get)
@@ -48,8 +62,6 @@ fun Application.module() {
     routing {
         route("/ai") {
             post("/chat") {
-                val apiKey = System.getenv("OPEN_ROUTER_API_KEY")
-
                 val chatHistory = call.receive<ChatHistory>()
                 val chatPreviousMessages = chatHistory.messages.subList(0, chatHistory.messages.size - 1)
                 val userInput = chatHistory.messages.last()
@@ -57,10 +69,7 @@ fun Application.module() {
                     "Last message must be from user!"
                 }
 
-                val agent = tasksManagementAiAgent(
-                    executor = simpleOpenRouterExecutor(apiKey),
-                    llmModel = OpenRouterModels.GPT5Mini,
-                ) {
+                val promptBuilder: PromptBuilder.() -> Unit = {
                     chatPreviousMessages.forEach {
                         when (it) {
                             is ChatMessage.UserChatMessage -> user(it.content)
@@ -68,6 +77,9 @@ fun Application.module() {
                             is ChatMessage.SystemChatMessage -> system(it.content)
                         }
                     }
+                }
+                val agent = get<AIAgent<String, String>>(named("personalAiAgent")) {
+                    parametersOf(promptBuilder)
                 }
 
                 val output = agent.run(userInput.content)

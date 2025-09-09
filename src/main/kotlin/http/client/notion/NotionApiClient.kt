@@ -24,7 +24,11 @@ private val json = Json {
     ignoreUnknownKeys = true
 }
 
-class NotionClient(token: String) {
+data class NotionClientConfig(
+    val token: String
+)
+
+class NotionClient(config: NotionClientConfig) {
     private val httpClient = buildHttpClient {
         install(ContentNegotiation) {
             json(json)
@@ -32,7 +36,7 @@ class NotionClient(token: String) {
 
         install(DefaultRequest) {
             headers.append("Notion-Version", "2025-09-03")
-            bearerAuth(token)
+            bearerAuth(config.token)
             contentType(ContentType.Application.Json)
         }
     }
