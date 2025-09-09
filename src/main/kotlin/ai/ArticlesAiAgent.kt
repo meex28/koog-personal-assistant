@@ -8,33 +8,26 @@ import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
 import ai.koog.prompt.markdown.markdown
 import ai.koog.prompt.text.text
-import com.example.ai.tools.NotionToolset
-import com.example.http.client.notion.NotionClient
 import tools.WebToolset
 
 fun articlesAiAgent(
-    notionClient: NotionClient,
     executor: PromptExecutor,
     llmModel: LLModel
 ): AIAgent<String, String> {
-    val notionDatabaseId = "26021a96563280b093eeda80fee9fb00"
-    val notionTools = NotionToolset(
-        notionClient = notionClient,
-        databaseId = notionDatabaseId
-    )
     val webTools = WebToolset()
 
     val systemPropt = markdown {
         h1("Context")
 
         +text {
-            +"You are a helpful assistant helping user to summarize articles."
-            +"User provides an article (URL) and your task is to summarize it."
+            +"You are a specialized assistant focused on summarizing articles."
+            +"User provides an article URL and your task is to fetch and summarize it."
         }
 
         h1("Rules")
         bulleted {
             item("Create summary in accordance to user's instructions.")
+            item("Focus only on summarization - do not save or manage articles.")
         }
 
         h1("Output format")
@@ -50,7 +43,6 @@ fun articlesAiAgent(
         llmModel = llmModel,
         toolRegistry = ToolRegistry {
             tools(webTools)
-            tools(notionTools)
         },
         systemPrompt = systemPropt
     ) {

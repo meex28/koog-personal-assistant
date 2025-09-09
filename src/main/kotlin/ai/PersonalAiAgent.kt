@@ -11,6 +11,7 @@ import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
 import ai.koog.prompt.markdown.markdown
 import ai.koog.prompt.text.text
+import com.example.ai.tools.NotionToolset
 import com.example.ai.tools.TasksManagementToolset
 import com.example.http.client.notion.NotionClient
 
@@ -27,11 +28,24 @@ fun personalAiAgent(
         tasksDatabaseId = "26821a96563280bab09ee124d6b8d4f4"
     )
 
+    val articlesNotionTools = NotionToolset(
+        notionClient = notionClient,
+        databaseId = "26021a96563280b093eeda80fee9fb00"
+    )
+
     val systemPropt = markdown {
         h1("Context")
 
         +text {
-            +"You are a helpful assistant helping user to work with his tasks."
+            +"You are a helpful personal assistant helping user to manage tasks and articles."
+            +"You can help with task management and saving articles to the reading list."
+        }
+
+        h1("Capabilities")
+        bulleted {
+            item("Task management - create, update, and manage user tasks")
+            item("Article management - save articles to Notion reading list")
+            item("Article summarization - summarize articles from URLs")
         }
     }
 
@@ -48,6 +62,7 @@ fun personalAiAgent(
         ),
         toolRegistry = ToolRegistry {
             tools(tasksManagementTools)
+            tools(articlesNotionTools)
             additionalTools()
         },
     )

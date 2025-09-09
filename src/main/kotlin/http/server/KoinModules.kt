@@ -41,7 +41,6 @@ val aiConfigurationModule = module {
 val aiAgentsModule = module {
     single<AIAgent<*, *>>(named("articlesAiAgent")) {
         articlesAiAgent(
-            notionClient = get(),
             executor = get(),
             llmModel = OpenRouterModels.GPT5
         )
@@ -50,10 +49,10 @@ val aiAgentsModule = module {
     single<Tool<AIAgentTool.AgentToolArgs, AIAgentTool.AgentToolResult>>(named("articlesAiAgentTool")) {
         get<AIAgent<String, String>>(named("articlesAiAgent")).asTool(
             agentName = "articlesExpert",
-            agentDescription = "An expert in articles. Capabilities: retrieve article content by URL, summarizing and managing articles in user database.",
+            agentDescription = "An expert in article summarization. Capabilities: retrieve article content by URL and create summaries.",
             inputDescriptor = ToolParameterDescriptor(
                 name = "request",
-                description = "Articles expert request",
+                description = "Article summarization request",
                 type = ToolParameterType.String
             ),
         )
